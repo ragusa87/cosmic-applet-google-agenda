@@ -192,6 +192,10 @@ Secrets are stored under Secret Service entry
   in "Testing" mode, refresh tokens expire after 7 days. Either re-authorize
   once a week, or move the app to "In production" (still no review needed
   for a single-user desktop client).
+- **Re-authorize from scratch / revoke access** → visit
+  <https://myaccount.google.com/connections>, pick the app, and remove its
+  access. The next **Authorize with Google** click will run the full consent
+  flow again.
 
 ## Scope rationale
 

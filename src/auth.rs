@@ -14,7 +14,7 @@ const AUTH_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly";
 
-const SUCCESS_HTML: &str = "<!doctype html><html><head><meta charset=\"utf-8\"><title>Authorization complete</title></head><body style=\"font-family:sans-serif;text-align:center;padding-top:4em\"><h1>You can close this tab</h1><p>The agenda applet has received your authorization.</p></body></html>";
+const SUCCESS_HTML: &str = "<!doctype html><html><head><meta charset=\"utf-8\"><title>Authorization complete</title><link rel=\"icon\" href=\"data:,\"></head><body style=\"font-family:sans-serif;text-align:center;padding-top:4em\"><h1>You can close this tab</h1><p>The agenda applet has received your authorization.</p></body></html>";
 
 fn http_client() -> Result<oauth2::reqwest::Client> {
     oauth2::reqwest::ClientBuilder::new()
@@ -75,7 +75,7 @@ pub async fn start_oauth_flow(client_id: String, client_secret: String) -> Resul
         .set_pkce_challenge(challenge)
         .url();
 
-    tracing::info!("opening browser for OAuth consent");
+    tracing::info!("opening browser for OAuth consent (loopback 127.0.0.1:{port})");
     if let Err(e) = tokio::process::Command::new("xdg-open")
         .arg(auth_url.as_str())
         .status()
