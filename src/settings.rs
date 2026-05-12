@@ -9,7 +9,7 @@ use crate::secrets::{self, Tokens};
 use crate::ui::{self, CredentialsForm, SettingsHandlers, Status};
 
 pub fn run() -> iced::Result {
-    // Both modes ship in the same binary, so `pkill -USR2 cosmic-google-agenda-panel`
+    // Both modes ship in the same binary, so `pkill -USR2 cosmic-applet-google-agenda`
     // would also reach this process. SIGUSR2's default action is to terminate;
     // ignore it here so an external "refresh the applet" signal doesn't kill
     // an open settings window.
@@ -39,6 +39,7 @@ pub enum Msg {
     ToggleShowTitle(bool),
     ToggleShowTime(bool),
     ToggleShowProgress(bool),
+    ToggleNotify(bool),
     Authorize,
     AuthorizeDone(Result<(String, String, Tokens), String>),
     Cancel,
@@ -106,6 +107,7 @@ impl cosmic::Application for SettingsApp {
             on_toggle_show_title: Msg::ToggleShowTitle,
             on_toggle_show_time: Msg::ToggleShowTime,
             on_toggle_show_progress: Msg::ToggleShowProgress,
+            on_toggle_notify: Msg::ToggleNotify,
             authorize: Msg::Authorize,
             cancel: Msg::Cancel,
         };
@@ -114,6 +116,7 @@ impl cosmic::Application for SettingsApp {
             self.config.show_title,
             self.config.show_time,
             self.config.show_progress,
+            self.config.notify,
             &self.status,
             self.authorizing,
             &handlers,
@@ -138,6 +141,11 @@ impl cosmic::Application for SettingsApp {
 
             Msg::ToggleShowProgress(on) => {
                 self.config.show_progress = on;
+                persist_config(&self.config);
+            }
+
+            Msg::ToggleNotify(on) => {
+                self.config.notify = on;
                 persist_config(&self.config);
             }
 

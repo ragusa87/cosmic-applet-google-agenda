@@ -1,13 +1,13 @@
 [package]
-name = "cosmic-google-agenda-panel"
+name = "cosmic-applet-google-agenda"
 version = "0.1.0"
 edition = "2024"
 license = "GPL-3.0-or-later"
 description = "COSMIC panel applet that shows your next Google Calendar event"
-repository = "https://github.com/laurent-c/cosmic-google-agenda-panel"
+repository = "https://github.com/ragusa87/cosmic-applet-google-agenda"
 
 [[bin]]
-name = "cosmic-google-agenda-panel"
+name = "cosmic-applet-google-agenda"
 path = "src/main.rs"
 
 [dependencies]

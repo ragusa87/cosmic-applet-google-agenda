@@ -18,7 +18,7 @@ pub fn run() -> Result<()> {
 
 #[allow(clippy::too_many_lines)]
 async fn run_async() -> Result<()> {
-    println!("=== cosmic-google-agenda-panel --debug ===");
+    println!("=== cosmic-applet-google-agenda --debug ===");
     println!();
 
     let config = cosmic_config::Config::new(APP_ID, Config::VERSION)
@@ -40,7 +40,10 @@ async fn run_async() -> Result<()> {
         "  notification_lead_secs: {}",
         config.notification_lead_secs
     );
+    println!("  notify:                 {}", config.notify);
     println!("  show_title:             {}", config.show_title);
+    println!("  show_time:              {}", config.show_time);
+    println!("  show_progress:          {}", config.show_progress);
     println!();
 
     if !config.is_configured() {
@@ -142,7 +145,9 @@ async fn run_async() -> Result<()> {
         };
         println!("Next visible event: {} — starts {}", ev.summary, until);
         let lead = i64::from(config.notification_lead_secs);
-        if config.notification_lead_secs == 0 {
+        if !config.notify {
+            println!("Notifications disabled (notify = false).");
+        } else if config.notification_lead_secs == 0 {
             println!("Notifications disabled (notification_lead_secs = 0).");
         } else if delta < 0 {
             println!("No notification — event already started.");

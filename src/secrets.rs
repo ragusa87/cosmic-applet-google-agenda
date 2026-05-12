@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-const SERVICE: &str = "cosmic-google-agenda-panel:tokens";
+const SERVICE: &str = "cosmic-applet-google-agenda:tokens";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Tokens {

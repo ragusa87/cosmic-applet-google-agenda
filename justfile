@@ -1,5 +1,5 @@
-name := 'cosmic-google-agenda-panel'
-appid := 'io.github.cosmic_google_agenda_panel'
+name := 'cosmic-applet-google-agenda'
+appid := 'com.github.ragusa87.CosmicAppletGoogleAgenda'
 
 rootdir := ''
 prefix := '/usr'

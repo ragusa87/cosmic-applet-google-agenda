@@ -1,4 +1,4 @@
-# cosmic-google-agenda-panel
+# cosmic-applet-google-agenda
 
 A small COSMIC desktop panel applet that shows the **next event** on your
 Google Calendar with a live countdown, and fires a desktop notification a
@@ -39,12 +39,12 @@ just install-user        # installs into ~/.local; use `sudo just install` for /
 
 `just install-user` lays the binary, desktop entry, and icon into:
 
-- `~/.local/bin/cosmic-google-agenda-panel`
-- `~/.local/share/applications/io.github.cosmic_google_agenda_panel.desktop`
-- `~/.local/share/icons/hicolor/scalable/apps/io.github.cosmic_google_agenda_panel.svg`
+- `~/.local/bin/cosmic-applet-google-agenda`
+- `~/.local/share/applications/com.github.ragusa87.CosmicAppletGoogleAgenda.desktop`
+- `~/.local/share/icons/hicolor/scalable/apps/com.github.ragusa87.CosmicAppletGoogleAgenda.svg`
 
 > ⚠️ `~/.local/bin` must be on your `$PATH` — the panel runs
-> `Exec=cosmic-google-agenda-panel` and resolves it via `PATH`. Most distros
+> `Exec=cosmic-applet-google-agenda` and resolves it via `PATH`. Most distros
 > add it automatically; check with
 > `echo $PATH | tr ':' '\n' | grep .local/bin`.
 
@@ -114,7 +114,7 @@ You can also launch the settings window directly without going through the
 panel:
 
 ```sh
-cosmic-google-agenda-panel --show-settings
+cosmic-applet-google-agenda --show-settings
 ```
 
 ## Debugging what the panel sees
@@ -125,7 +125,7 @@ hits the Calendar API once, and prints every fetched event to stdout
 together with the verdict (`KEEP` or `SKIP — <reason>`):
 
 ```sh
-cosmic-google-agenda-panel --debug
+cosmic-applet-google-agenda --debug
 ```
 
 The bottom of the report shows the configured intervals, which event would
@@ -139,12 +139,12 @@ To trigger an immediate fetch (e.g. from a script, key binding, or post-commit
 hook):
 
 ```sh
-pkill -USR2 cosmic-google-agenda-panel
+pkill -USR2 cosmic-applet-google-agenda
 ```
 
 On receiving SIGUSR2, the applet reloads the OAuth tokens from Secret Service
 and refetches events right away. The settings window (also running as
-`cosmic-google-agenda-panel`) ignores SIGUSR2, so sending the signal to all
+`cosmic-applet-google-agenda`) ignores SIGUSR2, so sending the signal to all
 processes with that name is safe — only the panel applet acts on it.
 
 ### Pre-filling credentials from the environment
@@ -162,7 +162,7 @@ environment.
 
 ## Configuration
 
-Non-secret settings live in `~/.config/io.github.cosmic_google_agenda_panel/v1/`:
+Non-secret settings live in `~/.config/com.github.ragusa87.CosmicAppletGoogleAgenda/v1/`:
 
 | Key                       | Default | Notes                                              |
 |---------------------------|---------|----------------------------------------------------|
@@ -176,7 +176,7 @@ Non-secret settings live in `~/.config/io.github.cosmic_google_agenda_panel/v1/`
 You can edit these by hand; the applet picks up changes live.
 
 Secrets are stored under Secret Service entry
-`cosmic-google-agenda-panel:tokens / {email}` as a JSON blob containing
+`cosmic-applet-google-agenda:tokens / {email}` as a JSON blob containing
 `client_secret`, `refresh_token`, `access_token`, and `expires_at_unix`.
 
 ## Troubleshooting
@@ -184,7 +184,7 @@ Secrets are stored under Secret Service entry
 - **Panel shows the icon with no countdown** → either no credentials yet
   (right-click → Credentials) or no upcoming event in the next 24h.
 - **Countdown never appears with credentials configured** → every fetch is
-  failing. Run `RUST_LOG=info cosmic-google-agenda-panel` from a terminal and
+  failing. Run `RUST_LOG=info cosmic-applet-google-agenda` from a terminal and
   watch the logs.
 - **`Secret Service unavailable`** → no keyring daemon is running.
   Install / start `gnome-keyring-daemon` (it ships with COSMIC by default).

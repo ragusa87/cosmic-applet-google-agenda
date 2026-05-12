@@ -1,7 +1,7 @@
 use cosmic::Element;
 use cosmic::applet::menu_button;
 use cosmic::iced::{Alignment, Length};
-use cosmic::widget::{Column, Row, button, settings, text, text_input, toggler};
+use cosmic::widget::{Column, Row, button, scrollable, settings, text, text_input, toggler};
 
 use crate::app::Message;
 
@@ -62,16 +62,18 @@ pub struct SettingsHandlers<M: Clone> {
     pub on_toggle_show_title: fn(bool) -> M,
     pub on_toggle_show_time: fn(bool) -> M,
     pub on_toggle_show_progress: fn(bool) -> M,
+    pub on_toggle_notify: fn(bool) -> M,
     pub authorize: M,
     pub cancel: M,
 }
 
-#[allow(clippy::fn_params_excessive_bools)]
+#[allow(clippy::fn_params_excessive_bools, clippy::too_many_arguments)]
 pub fn settings_view<'a, M: Clone + 'static>(
     form: &'a CredentialsForm,
     show_title: bool,
     show_time: bool,
     show_progress: bool,
+    notify: bool,
     status: &'a Status,
     authorizing: bool,
     handlers: &SettingsHandlers<M>,
@@ -135,7 +137,14 @@ pub fn settings_view<'a, M: Clone + 'static>(
             toggler(show_progress).on_toggle(handlers.on_toggle_show_progress),
         ));
 
-    Column::new()
+    let notifications_section = settings::section()
+        .title("Notifications")
+        .add(settings::item(
+            "Enable meeting notifications",
+            toggler(notify).on_toggle(handlers.on_toggle_notify),
+        ));
+
+    let content = Column::new()
         .padding(12)
         .spacing(10)
         .width(Length::Fill)
@@ -147,5 +156,10 @@ pub fn settings_view<'a, M: Clone + 'static>(
         .push(actions)
         .push(hint)
         .push(display_section)
+        .push(notifications_section);
+
+    scrollable(content)
+        .width(Length::Fill)
+        .height(Length::Fill)
         .into()
 }

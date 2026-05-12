@@ -19,7 +19,7 @@ use crate::ui;
 
 const CALENDAR_URL: &str = "https://calendar.google.com";
 const CALENDAR_ICON_SVG: &[u8] =
-    include_bytes!("../data/icons/io.github.cosmic_google_agenda_panel.svg");
+    include_bytes!("../data/icons/com.github.ragusa87.CosmicAppletGoogleAgenda.svg");
 
 #[derive(Default)]
 pub struct AppModel {
@@ -288,12 +288,12 @@ impl cosmic::Application for AppModel {
                 let now = Utc::now();
                 recompute_next(&mut self.events, &mut self.next, now);
                 prune_notified(&self.events, &mut self.notified);
-                maybe_notify(
-                    self.next.as_ref(),
-                    &mut self.notified,
-                    u64::from(self.config.notification_lead_secs),
-                    now,
-                );
+                let lead = if self.config.notify {
+                    u64::from(self.config.notification_lead_secs)
+                } else {
+                    0
+                };
+                maybe_notify(self.next.as_ref(), &mut self.notified, lead, now);
             }
 
             Message::Refetch => {
@@ -480,7 +480,7 @@ fn maybe_notify(
         notif
             .summary(&notice.summary)
             .body(&notice.body)
-            .icon("io.github.cosmic_google_agenda_panel");
+            .icon("com.github.ragusa87.CosmicAppletGoogleAgenda");
         if let Err(e) = notif.show() {
             tracing::warn!(error = %e, "failed to show meeting notification");
         }

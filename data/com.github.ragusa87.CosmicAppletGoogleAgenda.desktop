@@ -2,8 +2,8 @@
 Type=Application
 Name=Next meeting
 Comment=Show your next Google Calendar event in the COSMIC panel
-Exec=cosmic-google-agenda-panel
-Icon=io.github.cosmic_google_agenda_panel
+Exec=cosmic-applet-google-agenda
+Icon=com.github.ragusa87.CosmicAppletGoogleAgenda
 Terminal=false
 Categories=COSMIC;X-COSMIC-Applet;
 NoDisplay=true

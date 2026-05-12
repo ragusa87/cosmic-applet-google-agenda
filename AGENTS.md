@@ -15,10 +15,11 @@ picked by `argv`:
 | Panel applet | `cosmic::applet::run::<AppModel>(())` | transparent sub-surface inside the panel | default — no flag |
 | Settings window | `cosmic::app::run::<SettingsApp>(Settings, ())` | regular xdg_toplevel | `--show-settings` |
 | CLI debug dump | `debug::run()` (tokio current-thread, no iced) | stdout only | `--debug` |
+| Test notification | one-shot `notify_rust::Notification::show()` in `main.rs` | desktop notification | `--notify` (stacks with `--debug`) |
 
 The applet's right-click menu → **Credentials…** spawns `current_exe()` with
 `--show-settings`, which is how the user reaches the OAuth setup. Both modes
-share `APP_ID = "io.github.cosmic_google_agenda_panel"` so they read/write the
+share `APP_ID = "com.github.ragusa87.CosmicAppletGoogleAgenda"` so they read/write the
 same cosmic-config namespace and the same Secret Service entry.
 
 ## Why two modes, not two binaries
@@ -50,10 +51,10 @@ src/
 │                  CredentialsForm + Status types
 ├── config.rs      cosmic-config schema: email, client_id,
 │                  fetch_interval_secs, display_tick_secs,
-│                  notification_lead_secs, show_title,
-│                  show_time, show_progress
+│                  notification_lead_secs, notify,
+│                  show_title, show_time, show_progress
 ├── secrets.rs     keyring wrapper — stores a JSON blob keyed by email under
-│                  service "cosmic-google-agenda-panel:tokens" (sync API
+│                  service "cosmic-applet-google-agenda:tokens" (sync API
 │                  wrapped in spawn_blocking)
 ├── auth.rs        OAuth 2.0 PKCE + loopback redirect via the `oauth2`
 │                  crate; exports `start_oauth_flow` + `refresh`.
@@ -66,8 +67,8 @@ src/
                    (+ unit tests on the JSON parsing path)
 
 data/
-├── io.github.cosmic_google_agenda_panel.desktop   panel applet .desktop entry
-└── icons/io.github.cosmic_google_agenda_panel.svg Google Calendar blue grid
+├── com.github.ragusa87.CosmicAppletGoogleAgenda.desktop   panel applet .desktop entry
+└── icons/com.github.ragusa87.CosmicAppletGoogleAgenda.svg Google Calendar blue grid
                                                    also `include_bytes!`'d
                                                    into the binary for the
                                                    panel button
@@ -77,8 +78,8 @@ data/
 
 | Item | Where | Reason |
 |---|---|---|
-| `email`, `client_id`, `fetch_interval_secs`, `display_tick_secs`, `notification_lead_secs`, `show_title`, `show_time`, `show_progress` | cosmic-config (RON in `~/.config/io.github.cosmic_google_agenda_panel/v1/`) | non-secret, watched live |
-| `client_secret`, `refresh_token`, `access_token`, `expires_at_unix` | Secret Service via `keyring` v3, one JSON blob keyed by `email` under service `cosmic-google-agenda-panel:tokens` | secrets |
+| `email`, `client_id`, `fetch_interval_secs`, `display_tick_secs`, `notification_lead_secs`, `notify`, `show_title`, `show_time`, `show_progress` | cosmic-config (RON in `~/.config/com.github.ragusa87.CosmicAppletGoogleAgenda/v1/`) | non-secret, watched live |
+| `client_secret`, `refresh_token`, `access_token`, `expires_at_unix` | Secret Service via `keyring` v3, one JSON blob keyed by `email` under service `cosmic-applet-google-agenda:tokens` | secrets |
 
 Cross-binary propagation: the settings binary writes both. The applet's
 `watch_config::<Config>` subscription delivers `Message::UpdateConfig` when
@@ -109,11 +110,11 @@ The applet listens for SIGUSR2 (subscription in `src/app.rs::sigusr2_stream`,
 built on `tokio::signal::unix`). On receipt → `Message::Refetch`.
 
 The settings mode installs `SIG_IGN` for SIGUSR2 at startup so
-`pkill -USR2 cosmic-google-agenda-panel` (which would match both modes'
+`pkill -USR2 cosmic-applet-google-agenda` (which would match both modes'
 processes by name) doesn't terminate an open settings window. See
 `src/settings.rs::run`.
 
-Manual trigger: `pkill -USR2 cosmic-google-agenda-panel`. Watch
+Manual trigger: `pkill -USR2 cosmic-applet-google-agenda`. Watch
 `RUST_LOG=info` for "SIGUSR2 received…" to confirm.
 
 ## OAuth flow
@@ -177,13 +178,13 @@ cargo test          # JSON parsing tests in calendar.rs + helper tests in app.rs
 
 There is **no automated UI test** — a real COSMIC session is required. After
 changes to `view()`, panel layout, or popup logic, install + `pkill
-cosmic-google-agenda-panel` and the panel respawns it. Then:
+cosmic-applet-google-agenda` and the panel respawns it. Then:
 
 - Right-click → menu shows "Credentials…"
 - Left-click → opens Meet link of the next event (or
   `calendar.google.com` fallback)
-- `pkill -USR2 cosmic-google-agenda-panel` → immediate refetch
-- `cosmic-google-agenda-panel --show-settings` from a terminal → settings
+- `pkill -USR2 cosmic-applet-google-agenda` → immediate refetch
+- `cosmic-applet-google-agenda --show-settings` from a terminal → settings
   window (useful for UI iteration without rebuilding the panel)
 
 ## Conventions
